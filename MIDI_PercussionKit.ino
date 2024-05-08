@@ -88,11 +88,11 @@ typedef struct
 instrument_t PT[] =  // Percussion Table
 {
   // kmValue  Type         Pin     Activ   Excl      Vel     Sens
-  { 60,  INSTR_DIGITAL,    12,      0,   500,    PIN(A7),   VAL(0) },
-  { 62,  INSTR_DIGITAL,    11,      0,   500,    PIN(A7),   VAL(0) },
-  { 64,  INSTR_DIGITAL,    10,      0,   500,    PIN(A7),   VAL(0) },
-  { 66,  INSTR_DIGITAL,     9,      0,   500,    PIN(A7),   VAL(0) },
-  { 72,  INSTR_ANALOG,     A0,      0,   200,    PIN(A7),  VAL(50) },
+  { 60,  INSTR_DIGITAL,    12,      0,   500,    PIN(A5),   VAL(0) },
+  { 62,  INSTR_DIGITAL,    11,      0,   500,    PIN(A5),   VAL(0) },
+  { 64,  INSTR_DIGITAL,    10,      0,   500,    PIN(A5),   VAL(0) },
+  { 66,  INSTR_DIGITAL,     9,      0,   500,    PIN(A5),   VAL(0) },
+  { 72,  INSTR_ANALOG,     A0,      0,   200,    PIN(A5),  VAL(50) },
   //{ COWBELL,        INSTR_DIGITAL,  6,      0,    50,   VAL(127),  VAL(0) },
   //{ LO_BONGO,       INSTR_DIGITAL,  4,      0,     0,   VAL(127),  VAL(0) },
 };
