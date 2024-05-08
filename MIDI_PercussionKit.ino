@@ -1,3 +1,4 @@
+/* -*- mode: c -*- */
 /*
 Arduino MIDI Percussion kit by MajicDesigns
 
