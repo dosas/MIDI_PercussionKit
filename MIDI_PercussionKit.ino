@@ -104,7 +104,7 @@ uint16_t deRef(uint8_t v)
   if (v > VAL_MAX)
   {
     r = analogRead(v - VAL_MAX - 1) >> 3;   // always needs to be within 0..127, divide by 8
-    r = (r == 0 ? 1 : r);   // don't allow it to be 0
+    //r = (r == 0 ? 1 : r);   // don't allow it to be 0
   }
   else
     r = v;
