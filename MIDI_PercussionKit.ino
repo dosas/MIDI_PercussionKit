@@ -4,9 +4,9 @@ Arduino MIDI Percussion kit by MajicDesigns
 
 Blog article: https://arduinoplusplus.wordpress.com/?p=10118
 
-Outputs MIDI percussion messages based on the configured instruments for a 
-specific digital or analog port. The instruments are defined in the 
-Percussion Kit table (see below). No other changes to code should be necessary 
+Outputs MIDI percussion messages based on the configured instruments for a
+specific digital or analog port. The instruments are defined in the
+Percussion Kit table (see below). No other changes to code should be necessary
 once the instrument parameters are defined.
 
 If you like and use this code please consider making a small donation using
@@ -27,22 +27,22 @@ Each table entry represents an element of the percussion kit with the following 
 
 KMValue     Name of the instrument (from GM_Percussion.h)
 
-type        Digital (INSTR_ANALOG) or analog (INSTR_DIGITAL) interface for the sensor. 
+type        Digital (INSTR_ANALOG) or analog (INSTR_DIGITAL) interface for the sensor.
             - Digital signals are detected on a HIGH to LOW transition, so they
               need to be configured with PULL UP resistors.
             - Analog signals are standard analog 0-1024 value.
 
 pin         The Arduino input pin to which the actuating sensor is connected.
 
-activeTime  Time in ms that the note is active (ie, the time between NOTE_ON and 
+activeTime  Time in ms that the note is active (ie, the time between NOTE_ON and
             NOTE_OFF). Use 0 to forgo sending NOTE_OFF.
 
 excludeTime Time in ms that the instrument is locked out after the note is played.
             This is used to mask out secondary signals (eg bounce) from the instrument
             once the initial signal is detected.
 
-velocity    The default velocity of the MIDI note. This is required for digital 
-            signals as it does not include a magnitude. If specified with an analog 
+velocity    The default velocity of the MIDI note. This is required for digital
+            signals as it does not include a magnitude. If specified with an analog
             input it overrides any velocity information derived from the real signal.
 
 sensTrig    The analog input to read as the sensitivity threshold for the input value.
@@ -51,7 +51,7 @@ sensTrig    The analog input to read as the sensitivity threshold for the input 
 */
 
 const uint8_t VAL_MAX = 127;    // max midi 7 bit value
-const uint8_t NO_PIN = 0xff;    // no pin defined indicator 
+const uint8_t NO_PIN = 0xff;    // no pin defined indicator
 typedef enum { INSTR_ANALOG, INSTR_DIGITAL } instr_t;
 typedef enum { START, MEASURE, PLAY, EXCLUDE } state_t;
 
@@ -111,7 +111,7 @@ uint16_t deRef(uint8_t v)
 
 void handleDigital(instrument_t* p)
 // Handle an instrument that has been designated as digital type.
-// The value is either on or off and we need to detect a transition. 
+// The value is either on or off and we need to detect a transition.
 {
   uint8_t value = digitalRead(p->pin);
 
@@ -151,8 +151,8 @@ void handleDigital(instrument_t* p)
 
 void handleAnalog(instrument_t *p)
 // Handle an instrument that has been designated as an analog type.
-// The value is first detected when it exceeds the threshold, the max 
-// reading can then be used as the MIDI velocity, and finally the debounce 
+// The value is first detected when it exceeds the threshold, the max
+// reading can then be used as the MIDI velocity, and finally the debounce
 // time is counted out before resetting for next hit detection.
 {
   uint16_t v = analogRead(p->pin);
@@ -175,7 +175,7 @@ void handleAnalog(instrument_t *p)
       if (p->state == PLAY) PRINTS(" - to Play") else PRINTS(" - to Meas")
     }
   break;
-      
+
   case MEASURE: // capturing the maximum value of the activation
     if (v > p->lastValue)
       p->lastValue = v;
@@ -185,7 +185,7 @@ void handleAnalog(instrument_t *p)
       p->state = PLAY;
     }
     break;
-      
+
   case PLAY: // play the instrument
     if (p->noteOn) midi.noteOff(p->kmValue);  // if it was on, turn it off
     midi.noteOn(p->kmValue, p->lastValue);    // play the note
@@ -198,7 +198,7 @@ void handleAnalog(instrument_t *p)
     if (millis() - p->lastOnTime >= p->excludeTime)
       p->state = START;
   break;
-      
+
   default:
     midi.noteOff(p->kmValue);
     p->state = START;
