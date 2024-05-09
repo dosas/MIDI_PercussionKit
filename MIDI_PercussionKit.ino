@@ -58,6 +58,10 @@ typedef enum { START, MEASURE, PLAY, EXCLUDE } state_t;
 #define PIN(p) (p + VAL_MAX + 1)
 #define VAL(v) (v)
 
+uint8_t PROG_CHANGE_PLUS = 3;
+uint8_t PROG_CHANGE_MINUS = 2;
+uint8_t PROGRAM = 0;
+
 typedef struct
 {
   // Static data defining the instrument.
@@ -224,6 +228,33 @@ void checkNoteOff(void)
   }
 }
 
+bool buttonPressed(uint8_t pin){
+  uint8_t lastButtonState = HIGH;
+  uint8_t buttonState = digitalRead(pin);
+  if (buttonState != lastButtonState){
+    if ((buttonState == LOW) && (lastButtonState == HIGH)){
+      PRINT("\nButton pressed ", buttonState);
+      delay(500);
+      return true;
+    }
+  }
+  lastButtonState = buttonState;
+  return false;
+}
+
+void handleProgChange(void){
+  if (buttonPressed(PROG_CHANGE_MINUS) && PROGRAM > 0){
+      PROGRAM -= 1;
+      PRINT("\nSetting Program to ", PROGRAM);
+      midi.progChange(PROGRAM);
+  }
+  if (buttonPressed(PROG_CHANGE_PLUS) && PROGRAM < 127){
+      PROGRAM += 1;
+      PRINT("\nSetting Program to ", PROGRAM);
+      midi.progChange(PROGRAM);
+  }
+}
+
 void setup(void)
 {
   Serial.begin(SERIAL_RATE);
@@ -235,7 +266,11 @@ void setup(void)
   midi.chanNotesOff();
   midi.chanPolyOn();
   midi.ctlVolMSB(127);
-  midi.progChange(0);  // GM1 standard drum kit
+  midi.progChange(PROGRAM);  // GM1 standard drum kit
+
+  // set program change pins
+  pinMode(PROG_CHANGE_MINUS, INPUT_PULLUP);
+  pinMode(PROG_CHANGE_PLUS, INPUT_PULLUP);
 
   // Set up the percussion hardware interface
   for (uint8_t i = 0; i < ARRAY_SIZE(PT); i++)
@@ -258,6 +293,8 @@ void loop(void)
 {
   // Check if any notes need to be turned off
   checkNoteOff();
+
+  handleProgChange();
 
   // Process each instrument
   for (uint8_t i = 0; i < ARRAY_SIZE(PT); i++)
