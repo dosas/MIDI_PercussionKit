@@ -1,4 +1,5 @@
-env := nano-every
+#env := nano-every
+env := micro
 
 ifdef DEBUG
 env := $(env)-debug

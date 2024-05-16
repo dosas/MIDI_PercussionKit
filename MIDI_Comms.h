@@ -6,12 +6,13 @@
 #pragma once
 
 #include <Arduino.h>
+#include "MIDIUSB.h"
 #include "debug.h"
 
 class midiComms
 {
 public:
-  midiComms(Stream& s) : _S(s) {}
+  //midiComms(Stream& s) : _S(s) {}
 
   void begin(void) {}
 
@@ -46,24 +47,39 @@ public:
 
 private:
   const uint8_t PERCUSSION_CHANNEL = 9; // zero based channel number for GM percussion (Ch 10)
-  Stream& _S;   // output stream
+  //Stream& _S;   // output stream
 
   void midiSend(uint8_t message, uint8_t channel, uint8_t d1, uint8_t d2 = 0)
   // Send a MIDI message out the serial port
   {
+    /*
     uint8_t msg[3], l = 0;
 
     msg[l++] = message + channel;
     msg[l++] = d1;
     if (message <= 0xb0)
       msg[l++] = d2;
+    */
+    midiEventPacket_t event;
+    if (message <= 0xb0){
+      event = {message >> 4, message | channel, d1, d2};
+    } else {
+      event = {message >> 4, message | channel, d1};
+    }
 
-#if  USE_MIDI  
-    _S.write(msg, l);
+#if USE_MIDI
+    MidiUSB.sendMIDI(event);
+    MidiUSB.flush();
+    //_S.write(msg, l);
 #endif
 
+    /*
     PRINTX("\nCh: ", msg[0]);
     PRINT(" d1: ", msg[1]);
     PRINT(" d2: ", msg[2]);
+    */
+    PRINTX("\nCh: ", event.header);
+    PRINT(" d1: ", event.byte2);
+    PRINT(" d2: ", event.byte3);
   }
 };

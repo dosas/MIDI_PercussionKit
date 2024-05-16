@@ -97,7 +97,7 @@ instrument_t PT[] =  // Percussion Table
   //{ LO_BONGO,       INSTR_DIGITAL,  4,      0,     0,   VAL(127),  VAL(0) },
 };
 
-midiComms midi(Serial);
+midiComms midi;
 
 // Control code follows --------------------------
 uint16_t deRef(uint8_t v)
@@ -257,16 +257,15 @@ void handleProgChange(void){
 
 void setup(void)
 {
-  Serial.begin(SERIAL_RATE);
+  //Serial.begin(SERIAL_RATE);
+  //while (!Serial); // wait for serial port to connect. Needed for native USB on Micro
+  //while (!Serial) {
+  //  ; // wait for serial port to connect. Needed for native USB on Micro
+  //}
   PRINTS("\n[MIDI Percussion]");
 
   // initialize MIDI interface and devices
-  midi.begin();
-  midi.chanSoundOff();
-  midi.chanNotesOff();
-  midi.chanPolyOn();
-  midi.ctlVolMSB(127);
-  midi.progChange(PROGRAM);  // GM1 standard drum kit
+  //
 
   // set program change pins
   pinMode(PROG_CHANGE_MINUS, INPUT_PULLUP);
@@ -289,8 +288,21 @@ void setup(void)
   }
 }
 
+bool once = false;
+
 void loop(void)
 {
+  if (!once){
+    delay(2000);
+    midi.begin();
+    midi.chanSoundOff();
+    midi.chanNotesOff();
+    midi.chanPolyOn();
+    midi.ctlVolMSB(127);
+    midi.progChange(PROGRAM);  // GM1 standard drum kit
+    once = true;
+  }
+
   // Check if any notes need to be turned off
   checkNoteOff();
 
